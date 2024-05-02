@@ -16,4 +16,4 @@ if __name__ == "__main__":
       r = chunk.data[base]
       g = chunk.data[base+1]
       b = chunk.data[base+2]
-      print(f'color {i} is r:{r:2x} g:{g:2x} b:{b:2x}')
+      print(f'color {i:>4} is r:{r:02X} g:{g:02X} b:{b:02X}')
