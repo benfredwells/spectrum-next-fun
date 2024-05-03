@@ -29,7 +29,7 @@ def dumpPalette(path, png):
     try:
         # just handle 9 bit palettes for now
         palette_chunks = png.get_by_type(TYPE_PLTE)
-        output_bytes = bytes()
+        output_bytes = bytearray()
         for chunk in palette_chunks:
             for i in range(0, len(chunk.data) // 3):
                 base = i * 3
@@ -38,16 +38,15 @@ def dumpPalette(path, png):
                 b = truncateColour(chunk.data[base + 2])
                 byte_1 = r << 5 | g << 2 | b >> 1
                 byte_2 = b & 0x01
-                output_bytes += bytes(byte_1)
-                output_bytes += bytes(byte_2)
+                output_bytes.append(byte_1)
+                output_bytes.append(byte_2)
         f = open(path, mode="wb")
-        f.write(output_bytes)
+        written = f.write(output_bytes)
         f.close()
     except Exception as e:
         print("Could not write palette", e)
 
 def run(args):
-    png = None
     try:
         png = PngParser(args.input_file)
         if not checkPngValidity(png):
