@@ -17,6 +17,9 @@
 	ORG $8000
 
 PALETTE_SIZE EQU 128
+LAYER2_16K_BANK EQU 9
+RES_X = 320
+RES_Y = 256
 
 start:
   JP main
@@ -31,13 +34,35 @@ copy9BitPalette:
   DJNZ copy9BitPalette
   RET
 
+initLayer2:
+  ; enable layer 2 by setting bit 1 of Layer 2 Access Port $123B
+  ; https://wiki.specnext.dev/Layer_2
+  LD BC, $123B
+  LD A, 2
+  OUT (C), A
+
+  ;; setup starting 16k bank for layer2. $12 is only used for this.
+  NEXTREG $12, LAYER2_16K_BANK
+
+  ; set 320x256 mode ny writing.
+  ; writing 0 to low order bits of $70 also sets palette offset to 0
+  NEXTREG $70, %00010000
+
+  ; setup clip window for this resolution
+  NEXTREG $1C, 1
+  NEXTREG $18, 0
+  NEXTREG  $18 RESOLUTION_X / 2 - 1
+  RET
+
 main:
-  ;; copy palette with
+  ; prepare system and parameters to copy palette
   NEXTREG $43, %00010000  ; Auto increment. Layer 2 first palette for read/write
-  NEXTREG $40, 0         ; Start copying into index 0
+  NEXTREG $40, 0          ; Start copying into index 0
   LD HL, palette
   LD B, PALETTE_SIZE
   CALL copy9BitPalette
+  CALL initLayer2
+
 
 .infiniteLoop:
 	JR .infiniteLoop
