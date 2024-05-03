@@ -1,5 +1,4 @@
 from pngparser import PngParser, TYPE_PLTE
-import sys
 import argparse
 
 
@@ -17,29 +16,46 @@ def checkPngValidity(png):
     return True
 
 
+def truncateColour(colour):
+    # Use top three bits, however if this means a non-zero colour becomes zero,
+    # use the minimum non-zero colour
+    truncated = (colour & 0xE0) >> 5
+    if truncated == 0 and colour != 0:
+        truncated = 0x01
+    return truncated
+
+
+def dumpPalette(path, png):
+    try:
+        # just handle 9 bit palettes for now
+        palette_chunks = png.get_by_type(TYPE_PLTE)
+        output_bytes = bytes()
+        for chunk in palette_chunks:
+            for i in range(0, len(chunk.data) // 3):
+                base = i * 3
+                r = truncateColour(chunk.data[base])
+                g = truncateColour(chunk.data[base + 1])
+                b = truncateColour(chunk.data[base + 2])
+                byte_1 = r << 5 | g << 2 | b >> 1
+                byte_2 = b & 0x01
+                output_bytes += byte_1
+                output_bytes += byte_2
+        f = open(path, mode="wb")
+        f.write(output_bytes)
+        f.close()
+    except Exception as e:
+        print("Could not write palette", e)
+
 def run(args):
     png = None
     try:
-        png = PngParser(args.input)
+        png = PngParser(args.input_file)
+        if not checkPngValidity(png):
+            return
+        dumpPalette(args.p_file, png)
     except Exception as e:
         print(e)
-        exit()
-    if not checkPngValidity(png):
-        exit()
-    palette_chunks = png.get_by_type(TYPE_PLTE)
-    for chunk in palette_chunks:
-        print("Have a chunk")
-        print(f"size {len(chunk.data)}")
-        for i in range(0, len(chunk.data) // 3):
-            base = i * 3
-            r = chunk.data[base]
-            g = chunk.data[base + 1]
-            b = chunk.data[base + 2]
-            print(f"color {i:>4} is r:{r:02X} g:{g:02X} b:{b:02X}")
-
-    lines = png.get_image_data().scanlines
-    print(f"there are {len(lines)} lines")
-    print(f"each line is {len(lines[0].data)} bytes long")
+        return
 
 
 def processArgs():
@@ -49,7 +65,7 @@ def processArgs():
         "-p", "--p_file", default="palette.bin", help="Output palette file name"
     )
     parser.add_argument(
-        "-o", "--o-file", default="image.bin", help="Image output file name"
+        "-o", "--o_file", default="image.bin", help="Image output file name"
     )
     return parser.parse_args()
 
