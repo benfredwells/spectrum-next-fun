@@ -41,7 +41,20 @@ def dumpPalette(path, png):
                 output_bytes.append(byte_1)
                 output_bytes.append(byte_2)
         f = open(path, mode="wb")
-        written = f.write(output_bytes)
+        f.write(output_bytes)
+        f.close()
+    except Exception as e:
+        print("Could not write palette", e)
+
+def dumpImage(path, png):
+    try:
+        output_bytes = bytearray()
+        lines = png.get_image_data().scanlines
+        for line in lines:
+            for pixel in line.data:
+                output_bytes.append(pixel)
+        f = open(path, mode="wb")
+        f.write(output_bytes)
         f.close()
     except Exception as e:
         print("Could not write palette", e)
@@ -52,6 +65,7 @@ def run(args):
         if not checkPngValidity(png):
             return
         dumpPalette(args.p_file, png)
+        dumpImage(args.o_file, png)
     except Exception as e:
         print(e)
         return
