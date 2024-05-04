@@ -70,9 +70,25 @@ initLayer2:
   ; 3-0 Palette offset (0 after soft reset)
   NEXTREG $70, %00010000
 
+  ; Clip Window Control $1C (Write)
+  ; Bit Effect
+  ; 7-4 Reserved, must be 0
+  ; 3   1 to reset Tilemap clip-window register index
+  ; 2   1 to reset ULA/LoRes clip-window register index
+  ; 1   1 to reset Sprite clip-window register index
+  ; 0   1 to reset Layer 2 clip-window register index
   NEXTREG $1C, 1
+
+  ; Clip Window Layer 2 $18
+  ; Bits 7-0 Read / writes clip-window co-ordinates for Layer 2
+  ; 4 writes to write co-ordinates, in order: X1, X2, Y1, Y2
+  ; Positions are inclusive
+  ; X positions doubled for 320x256 mode
+  ; X positions quadrupled for 640x256 mode
   NEXTREG $18, 0
-  NEXTREG  $18 RESOLUTION_X / 2 - 1
+  NEXTREG $18 RES_X / 2 - 1
+  NEXTREG $18 0
+  NEXTREG $18 RES_Y - 1
   RET
 
 main:
@@ -83,7 +99,6 @@ main:
   LD B, PALETTE_SIZE
   CALL copy9BitPalette
   CALL initLayer2
-
 
 .infiniteLoop:
 	JR .infiniteLoop
