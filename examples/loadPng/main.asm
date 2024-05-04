@@ -25,6 +25,9 @@ RES_X = 320
 RES_Y = 256
 LAYER_2_8K_BANKS = RES_X * RES_Y / BANK_SIZE_8K
 
+IMAGE_16K_BANK = 16
+IMAGE_8K_BANK = IMAGE_16K_BANK * 2
+
 start:
   JP main
 
@@ -125,20 +128,26 @@ initLayer2:
   RET
 
 ; Parameters:
-; HL: start address of screen image
+; B: start bank for image to put on screen
 loadScreen:
   ; In 320x256 mode, pixels are arranged in memory in the vertical lines. i.e.
   ; offset   0 is (0, 0), offset   0 is (0, 1)
   ; offset 256 is (1, 0), offset 257 is (2, 1)
   ; This is spread over 5 8K banks.
   ; Uses these registers:
-  ; B: Bank
+  ; B: Image (source) Bank
+  ; C: Layer 2 (destination) Bank
+  ; HL: Read address
   ; DE: Write address
 
   ; Initialize bank
-  LD B, LAYER2_8K_BANK
+  LD C, LAYER2_8K_BANK
 loadBank:
   LD A, B
+  ; Memory Management Slot 5 Bank $55
+  ; Contains the 8K bank address for Slot 5
+  NEXTREG $55, A
+  LD A, C
   ; Memory Management Slot 6 Bank $56
   ; Contains the 8K bank address for Slot 6
   NEXTREG $56, A
@@ -162,7 +171,8 @@ writePixel:
 
   ; We need to change bank, unless we're done
   INC B
-  LD A, B
+  INC C
+  LD A, C
   CP LAYER2_8K_BANK + LAYER_2_8K_BANKS
   JP NZ, loadBank
   RET
@@ -174,7 +184,7 @@ main:
 
   CALL initLayer2
 
-  LD HL, screen
+  LD B, IMAGE_8K_BANK
   CALL loadScreen
 
 .infiniteLoop:
@@ -189,8 +199,22 @@ main:
 palette:
 	INCBIN "palette.bin"
 
-screen:
-  INCBIN "image.bin"
+  SLOT 6
+  PAGE IMAGE_8K_BANK
+  ORG $C000
+  INCBIN "image.bin", 0, $2000
+  PAGE IMAGE_8K_BANK+1
+  ORG $C000
+  INCBIN "image.bin", $2000, $2000
+  PAGE IMAGE_8K_BANK+2
+  ORG $C000
+  INCBIN "image.bin", $4000, $2000
+  PAGE IMAGE_8K_BANK+3
+  ORG $C000
+  INCBIN "image.bin", $6000, $2000
+  PAGE IMAGE_8K_BANK+4
+  ORG $C000
+  INCBIN "image.bin", $8000, $2000
 
 ;;--------------------------------------------------------------------
 ;; Set up .nex output
@@ -202,7 +226,7 @@ screen:
 
 	; This asserts the minimum core version.  Set it to the core version
 	; you are developing on.
-	SAVENEX CORE 2,0,0
+	SAVENEX CORE 3,0,6
 
 	; This sets the border colour while loading (in this case white),
 	; what to do with the file handle of the nex file when starting (0 =
@@ -212,5 +236,6 @@ screen:
 	; whether we require the full 2MB expansion (0 = no we don't).
 	SAVENEX CFG 7,0,0,0
 
-	; Generate the Nex file automatically based on which pages you use.
-	SAVENEX AUTO
+  SAVENEX AUTO
+
+  SAVENEX CLOSE
