@@ -48,7 +48,7 @@ copy9BitPalette:
   ; Palette Index $40
   ; Reads / writes palette colour index to be manipluated
   NEXTREG $40, 0
-loop:
+copy9BitPalette_loop:
   ; Enhanced ULA Palette Extension $44
   ; Reads or writes 9 bit colour definition in two read / writes
   ; First read / write:
@@ -67,7 +67,7 @@ loop:
   LD A, (HL)
   INC HL
   NEXTREG $44, A
-  DJNZ copy9BitPalette
+  DJNZ copy9BitPalette_loop
   RET
 
 initLayer2:
@@ -152,7 +152,10 @@ loadBank:
   ; Contains the 8K bank address for Slot 6
   NEXTREG $56, A
 
-  ; Go to the start of Slot 6
+  ; Move read pointer to the start of slot 5
+  LD HL, $A000
+
+  ; Move write pointer to the start of Slot 6
   LD DE, $C000
 writePixel:
   LD A, (HL)
@@ -165,7 +168,7 @@ writePixel:
   ; If E is zero we need to INC D and check where we are
   INC D
   LD A, D
-  AND %0011111
+  AND %00111111
   CP BANK_SIZE_8K_H
   JP NZ, writePixel
 
