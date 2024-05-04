@@ -16,14 +16,21 @@
 
 	ORG $8000
 
-PALETTE_SIZE EQU 128
-LAYER2_16K_BANK EQU 9
+PALETTE_SIZE = 128
+LAYER2_16K_BANK = 9
+LAYER2_8K_BANK = LAYER2_16K_BANK * 2
+BANK_SIZE_8K = 8192
+BANK_SIZE_8K_H = BANK_SIZE_8K / 256
 RES_X = 320
 RES_Y = 256
+LAYER_2_8K_BANKS = RES_X * RES_Y / BANK_SIZE_8K
 
 start:
   JP main
 
+; Call with parameters
+; HL palette address
+; B  palette size
 copy9BitPalette:
   ; Enhanced ULA Control $43
   ; Bit Effect
@@ -117,8 +124,48 @@ initLayer2:
   NEXTREG $18, RES_Y - 1
   RET
 
-loadImage:
+; Parameters:
+; HL: start address of screen image
+loadScreen:
+  ; In 320x256 mode, pixels are arranged in memory in the vertical lines. i.e.
+  ; offset   0 is (0, 0), offset   0 is (0, 1)
+  ; offset 256 is (1, 0), offset 257 is (2, 1)
+  ; This is spread over 5 8K banks.
+  ; Uses these registers:
+  ; B: Bank
+  ; DE: Write address
 
+  ; Initialize bank
+  LD B, LAYER2_8K_BANK
+loadBank:
+  LD A, B
+  ; Memory Management Slot 6 Bank $56
+  ; Contains the 8K bank address for Slot 6
+  NEXTREG $56, A
+
+  ; Go to the start of Slot 6
+  LD DE, $C000
+writePixel:
+  LD A, (HL)
+  LD (DE), A
+  INC HL
+  ; Inc DE in two steps so we can test each byte
+  INC E
+  ; If E is non-zero we can't be at the end of the bank
+  JR NZ, writePixel
+  ; If E is zero we need to INC D and check where we are
+  INC D
+  LD A, D
+  AND %0011111
+  CP BANK_SIZE_8K_H
+  JP NZ, writePixel
+
+  ; We need to change bank, unless we're done
+  INC B
+  LD A, B
+  CP LAYER2_8K_BANK + LAYER_2_8K_BANKS
+  JP NZ, loadBank
+  RET
 
 main:
   LD HL, palette
