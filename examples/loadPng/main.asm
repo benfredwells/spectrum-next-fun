@@ -50,20 +50,26 @@ initLayer2:
   ; 2   Enable Layer 2 read-only paging on 16K slot 0 (core 3.0+)
   ; 1   Layer 2 visible (mirrored in Display Control 1 $69)
   ; 0   Enable Layer 2 write-only paging on 16K slot 0
-
-  ; enable layer 2 by setting bit 1 of Layer 2 Access Port $123B
   LD BC, $123B
-  LD A, 2
+  LD A, %00000010
   OUT (C), A
 
-  ;; setup starting 16k bank for layer2. $12 is only used for this.
+  ; Layer 2 RAM Page $12
+  ; Bit Effect
+  ; 7   Reserved, must be 0
+  ; 6-0 Starting 16K bank of Layer 2
   NEXTREG $12, LAYER2_16K_BANK
 
-  ; set 320x256 mode ny writing.
-  ; writing 0 to low order bits of $70 also sets palette offset to 0
+  ; Layer 2 Control $70
+  ; Bit Effect
+  ; 7-6 Reserved, must be 0
+  ; 5-4 Layer 2 resolution (0 after soft reset)
+  ;     00 256x192 8BPP
+  ;     01 320x256 8BPP
+  ;     00 640x256 4BPP
+  ; 3-0 Palette offset (0 after soft reset)
   NEXTREG $70, %00010000
 
-  ; setup clip window for this resolution
   NEXTREG $1C, 1
   NEXTREG $18, 0
   NEXTREG  $18 RESOLUTION_X / 2 - 1
