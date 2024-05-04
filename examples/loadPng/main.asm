@@ -202,6 +202,7 @@ main:
 palette:
 	INCBIN "palette.bin"
 
+  ; Surely there is a better way to do this??
   SLOT 6
   PAGE IMAGE_8K_BANK
   ORG $C000
@@ -218,6 +219,21 @@ palette:
   PAGE IMAGE_8K_BANK+4
   ORG $C000
   INCBIN "image.bin", $8000, $2000
+  PAGE IMAGE_8K_BANK+5
+  ORG $C000
+  INCBIN "image.bin", $A000, $2000
+  PAGE IMAGE_8K_BANK+6
+  ORG $C000
+  INCBIN "image.bin", $C000, $2000
+  PAGE IMAGE_8K_BANK+7
+  ORG $C000
+  INCBIN "image.bin", $E000, $2000
+  PAGE IMAGE_8K_BANK+8
+  ORG $C000
+  INCBIN "image.bin", $8000, $2000
+  PAGE IMAGE_8K_BANK+9
+  ORG $C000
+  INCBIN "image.bin", $10000, $2000
 
 ;;--------------------------------------------------------------------
 ;; Set up .nex output
