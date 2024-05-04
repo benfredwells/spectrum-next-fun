@@ -50,9 +50,9 @@ def dumpImage(path, png):
     try:
         output_bytes = bytearray()
         lines = png.get_image_data().scanlines
-        for line in lines:
-            for pixel in line.data:
-                output_bytes.append(pixel)
+        for x in range(0, len(lines[0].data)):
+          for line in lines:
+              output_bytes.append(line.data[x])
         f = open(path, mode="wb")
         f.write(output_bytes)
         f.close()
