@@ -230,10 +230,10 @@ palette:
   INCBIN "image.bin", $E000, $2000
   PAGE IMAGE_8K_BANK+8
   ORG $C000
-  INCBIN "image.bin", $8000, $2000
+  INCBIN "image.bin", $10000, $2000
   PAGE IMAGE_8K_BANK+9
   ORG $C000
-  INCBIN "image.bin", $10000, $2000
+  INCBIN "image.bin", $12000, $2000
 
 ;;--------------------------------------------------------------------
 ;; Set up .nex output
