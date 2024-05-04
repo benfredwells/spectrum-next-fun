@@ -35,8 +35,23 @@ copy9BitPalette:
   RET
 
 initLayer2:
+  ; Layer 2 Access Port $123B
+  ; Bit Effect
+  ; 7-6 Video RAM bank select
+  ;     00 First 16K of layer 2 in the bottom 16K slot
+  ;     01 Second 16K of layer 2 in the bottom 16K slot
+  ;     10 Third 16K of layer 2 in the bottom 16K slot
+  ;     11 First 48K of layer 2 in the bottom 48K - 16K slots 0-2 (core 3.0+)
+  ; 5   Reserved, use 0
+  ; 4   0 (1 for extra options since core 3.0.7)
+  ; 3   Use Shadow Layer 2 for paging
+  ;     0 Map Layer 2 RAM Page $12
+  ;     1 Map Layer 2 RAM Shadow Page #13
+  ; 2   Enable Layer 2 read-only paging on 16K slot 0 (core 3.0+)
+  ; 1   Layer 2 visible (mirrored in Display Control 1 $69)
+  ; 0   Enable Layer 2 write-only paging on 16K slot 0
+
   ; enable layer 2 by setting bit 1 of Layer 2 Access Port $123B
-  ; https://wiki.specnext.dev/Layer_2
   LD BC, $123B
   LD A, 2
   OUT (C), A
