@@ -86,9 +86,9 @@ initLayer2:
   ; X positions doubled for 320x256 mode
   ; X positions quadrupled for 640x256 mode
   NEXTREG $18, 0
-  NEXTREG $18 RES_X / 2 - 1
-  NEXTREG $18 0
-  NEXTREG $18 RES_Y - 1
+  NEXTREG $18, RES_X / 2 - 1
+  NEXTREG $18, 0
+  NEXTREG $18, RES_Y - 1
   RET
 
 main:
