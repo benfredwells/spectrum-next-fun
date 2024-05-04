@@ -174,6 +174,9 @@ main:
 
   CALL initLayer2
 
+  LD HL, screen
+  CALL loadScreen
+
 .infiniteLoop:
 	JR .infiniteLoop
 
@@ -185,6 +188,9 @@ main:
 
 palette:
 	INCBIN "palette.bin"
+
+screen:
+  INCBIN "image.bin"
 
 ;;--------------------------------------------------------------------
 ;; Set up .nex output
