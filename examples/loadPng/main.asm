@@ -25,6 +25,32 @@ start:
   JP main
 
 copy9BitPalette:
+  ; Enhanced ULA Control $43
+  ; Bit Effect
+  ; 7   1 to disable palette index auto-increment, 0 to enable
+  ; 6-4 Selects palette for read or write
+  ;     000 / 100 ULA first / second palette
+  ;     001 / 101 Layer 2 first / second palette
+  ;     010 / 110 Sprites first / second palette
+  ;     011 / 111 Tilemap first / second palette
+  NEXTREG $43, %00010000
+
+  ; Palette Index $40
+  ; Reads / writes palette colour index to be manipluated
+  NEXTREG $40, 0
+loop:
+  ; Enhanced ULA Palette Extension $44
+  ; Reads or writes 9 bit colour definition in two read / writes
+  ; First read / write:
+  ; Bit Field
+  ; 7-5 R
+  ; 4-2 G
+  ; 1-0 B2-B1
+  ; Second read / write:
+  ; Bit Field
+  ; 7   Layer 2 Priority (if 1 this colour is on top)
+  ; 6-1 Reserved, set to 0
+  ; 0   B0
   LD A, (HL)
   INC HL
   NEXTREG $44, A
@@ -91,13 +117,14 @@ initLayer2:
   NEXTREG $18, RES_Y - 1
   RET
 
+loadImage:
+
+
 main:
-  ; prepare system and parameters to copy palette
-  NEXTREG $43, %00010000  ; Auto increment. Layer 2 first palette for read/write
-  NEXTREG $40, 0          ; Start copying into index 0
   LD HL, palette
   LD B, PALETTE_SIZE
   CALL copy9BitPalette
+
   CALL initLayer2
 
 .infiniteLoop:
