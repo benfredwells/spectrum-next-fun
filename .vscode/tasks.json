@@ -2,14 +2,14 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "BuildLoadPng",
+			"label": "Build",
 			"type": "shell",
-			"command": "${workspaceRoot}/../Tools/sjasmplus/sjasmplus.exe",
+			"command": "${workspaceRoot}/SpectrumToolChain/sjasmplus/sjasmplus.exe",
 			"args": [
 				"--sld=${workspaceRoot}/build/test.sld",
 				"--sym=${workspaceRoot}/build/test.labels",
 				"--fullpath",
-				"examples/loadPng/main.asm"
+				"${file}"
 			],
 			"problemMatcher": {
 				"fileLocation": [
@@ -32,7 +32,7 @@
 		{
 			"label": "Copy",
 			"type": "shell",
-			"command": "${workspaceRoot}/../Tools/hdfmonkey.exe",
+			"command": "${workspaceRoot}/SpectrumToolchain/hdfmonkey.exe",
 			"args": [
 				"put",
 				"c:/dev/next-sd-card/cspect-next-2gb.img",
@@ -60,17 +60,17 @@
 		{
 			"label": "Launch ZEsarUX",
 			"type": "shell",
-			"command": "${workspaceRoot}/../Tools/ZEsarUX/ZEsarUX.exe",
+			"command": "${workspaceRoot}/SpectrumToolchain/ZEsarUX/ZEsarUX.exe",
 			"options": {
-				"cwd": "${workspaceRoot}/../Tools/ZEsarUX"
+				"cwd": "${workspaceRoot}/SpectrumToolchain/ZEsarUX"
 			}
 		},
 		{
 			"label": "Launch CSpect",
 			"type": "shell",
-			"command": "${workspaceRoot}/../Tools/CSpect/CSpect.exe -debug -exit -brk -sound -tv -esc -zxnext -nextrom -mmc=c:/dev/next-sd-card/cspect-next-2gb.img > output.log",
+			"command": "${workspaceRoot}/SpectrumToolchain/CSpect/CSpect.exe -debug -exit -brk -sound -tv -esc -zxnext -nextrom -mmc=c:/dev/next-sd-card/cspect-next-2gb.img > output.log",
 			"options": {
-				"cwd": "${workspaceRoot}/../Tools/CSpect"
+				"cwd": "${workspaceRoot}/SpectrumToolchain/CSpect"
 			},
 			"problemMatcher": []
 		}
