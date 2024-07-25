@@ -1,5 +1,5 @@
 # spectrum-next-fun
-Some fun experiments with the ZX Spectrum Next. This is currently setup to be built and emulated on a Windows machine (the emulator is Windows only).
+Some fun experiments with the ZX Spectrum Next. These instructions are for Windows.
 
 ## Project contents
 
