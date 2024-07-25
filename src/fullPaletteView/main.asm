@@ -178,30 +178,38 @@ drawSquare:
   ; Contains the 8K bank address for Slot 6
   NEXTREG $56, A
 
-  ; Move write pointer to the start of Slot 6
-  LD DE, $C000
+  ; B is , E is Y within the grid square
+  ; Start on the left
+  LD B, 0
 .writeVerticalLine
-  LD A, D
+  ; load the square start from data
+  LD HL, square_start_ys
+  LD A, L
+  ADD A, B
+  LD L, A
+  LD A, (HL)
+  ; jump ahead those many pixels
+  LD E, A
+.writePixel:
+  ; add the slot offset to have DE point into the screen buffer
+  LD A, B
   OR A, %11000000
   LD D, A
-  ; LD HL, square_starts
-.writePixel:
   LD A, FG_COLOUR
   LD (DE), A
-  ; E corresponds to Y
   INC E
-  LD A, GRID_SIZE
+  ; load the size for this column
+  LD HL, square_stop_ys
+  LD A, L
+  ADD A, B
+  LD L, A
+  LD A, (HL)
   SBC A, E
-  ; If A-E is 0, we
+  ; If we have done square_sizes[column] pixels we're done
   JR NZ, .writePixel
-  LD E, 0
-  ; the lower 6 bits of D correspond to X
-  INC D
-  LD A, D
-  AND A, %00111111
-  LD D, A
+  INC B
   LD A, GRID_SIZE
-  SBC A, D
+  SBC A, B
   JR NZ, .writeVerticalLine
   RET
 
@@ -209,7 +217,6 @@ main:
   CALL initPalette
   CALL initLayer2
   CALL clearScreen
-	; JR .infiniteLoop
   CALL drawSquare
 
 .infiniteLoop:
@@ -225,21 +232,21 @@ main:
 ;  - i.e. for each column of pixels in the grid, what is the y offset
 ;  - of the topmost pixel
 ;  - there need to be GRID_SIZE of these and each one is < GRID_SIZE
-square_starts:
+square_start_ys:
+  DB 1
   DB 0
   DB 0
-  DB 0
-  DB 0
+  DB 1
 
 ; square_lengths - an array of y pixel counts for the square
 ;  - i.e. how many pixels are in each column of pixels in the grid
 ;  - there need to be GRID_SIZE of these and the sum of this and
-;    square_starts needs to be < GRID_SIZE
-square_sizes:
-  DB 0
+;    square_starts needs to be < GRID_SIZE+1
+square_stop_ys:
   DB 4
+  DB 5
+  DB 5
   DB 4
-  DB 0
 
 ;;--------------------------------------------------------------------
 ;; Set up .nex output
