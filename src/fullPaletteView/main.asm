@@ -179,22 +179,29 @@ drawSquare:
 
   ; Move write pointer to the start of Slot 6
   LD DE, $C000
+.writeVerticalLine
 .writePixel:
   LD A, FG_COLOUR
   LD (DE), A
-  ; Inc DE in two steps so we can test each byte
+  ; E corresponds to Y
   INC E
   LD A, GRID_SIZE
   SBC A, E
   ; If A-E is 0, we
   JR NZ, .writePixel
+  LD E, 0
+  ; D corresponds to X
+  INC D
+  LD A, GRID_SIZE
+  SBC A, D
+  JR NZ, .writeVerticalLine
   RET
 
 main:
+  CALL initPalette
   CALL initLayer2
   CALL clearScreen
   CALL drawSquare
-  CALL initPalette
 
 .infiniteLoop:
 	JR .infiniteLoop
