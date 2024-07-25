@@ -48,20 +48,26 @@ To setup, these tools all need to be installed into the `.\SpectrumToolchain` fo
 - CSpect (emulator), which can be found here: https://mdf200.itch.io/cspect
   - unzip the install contents into `.\SpectrumToolchain\CSpect`
 
-To build:
+Other useful tools:
+- Z80 Macro Assembler VS Code extension: https://marketplace.visualstudio.com/items?itemName=mborik.z80-macroasm
+
+#### Build
 - Make sure there is a `.\build` folder
 - Open the .asm file to be built (e.g. `.\src\loadPng\main.asm`)
 - Run the Build command in vs code (ctrl+shift+B > Build)
 - This will create `.\build\test.nex`
 
-To 'install' the last built program:
+#### Install
 - This will add `.\build\test.nex` to the disk image in `.\next-sd-card`
 - Run the Copy task (ctrl+shift_P > Type task > Run task > select Copy)
 
-To emulate
+#### Emulate
 - This will run the emulator using the disk image in `.\next-sd-card`
 - Run the Launch CSpect task (ctrl+shift+P > Type task > Run task > select Launch CSpect)
 - CSpect is a little hard to use, read the `.\SpectrumToolchain\CSpect\ReadMe.txt` for instructions
   - The emulator starts paused, to run press F1
   - From there you can use the Spectrum Next browser to find the test.nex file and run it
   - To pause, hit F1 again which will drop you in the emulator view
+
+#### Run
+- Copy the `test.nex` file from `.\build` to your (real) Spectrum Next SD card
