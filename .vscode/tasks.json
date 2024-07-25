@@ -4,7 +4,7 @@
 		{
 			"label": "Build",
 			"type": "shell",
-			"command": "${workspaceRoot}/SpectrumToolChain/sjasmplus/sjasmplus.exe",
+			"command": "${workspaceRoot}/SpectrumToolchain/sjasmplus/sjasmplus.exe",
 			"args": [
 				"--sld=${workspaceRoot}/build/test.sld",
 				"--sym=${workspaceRoot}/build/test.labels",
@@ -35,7 +35,7 @@
 			"command": "${workspaceRoot}/SpectrumToolchain/hdfmonkey.exe",
 			"args": [
 				"put",
-				"c:/dev/next-sd-card/cspect-next-2gb.img",
+				"${workspaceRoot}/next-sd-card/diskimage.img",
 				"${workspaceRoot}/build/test.nex",
 				"/test.nex"
 			],
@@ -68,7 +68,7 @@
 		{
 			"label": "Launch CSpect",
 			"type": "shell",
-			"command": "${workspaceRoot}/SpectrumToolchain/CSpect/CSpect.exe -debug -exit -brk -sound -tv -esc -zxnext -nextrom -mmc=c:/dev/next-sd-card/cspect-next-2gb.img > output.log",
+			"command": "${workspaceRoot}/SpectrumToolchain/CSpect/CSpect.exe -debug -exit -brk -sound -tv -esc -zxnext -nextrom -mmc=${workspaceRoot}/next-sd-card/diskimage.img > output.log",
 			"options": {
 				"cwd": "${workspaceRoot}/SpectrumToolchain/CSpect"
 			},
