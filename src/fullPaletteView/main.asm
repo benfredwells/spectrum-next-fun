@@ -24,7 +24,7 @@ RES_X = 320
 RES_Y = 256
 LAYER_2_8K_BANKS = RES_X * RES_Y / BANK_SIZE_8K
 
-GRID_SIZE = 32
+GRID_SIZE = 4
 
 BG_COLOUR = 0
 FG_COLOUR = 1
@@ -169,6 +169,7 @@ clearScreen:
   JP NZ, .loadBank
   RET
 
+
 drawSquare:
   ; Initialize bank
   LD C, LAYER2_8K_BANK
@@ -180,6 +181,10 @@ drawSquare:
   ; Move write pointer to the start of Slot 6
   LD DE, $C000
 .writeVerticalLine
+  LD A, D
+  OR A, %11000000
+  LD D, A
+  ; LD HL, square_starts
 .writePixel:
   LD A, FG_COLOUR
   LD (DE), A
@@ -190,8 +195,11 @@ drawSquare:
   ; If A-E is 0, we
   JR NZ, .writePixel
   LD E, 0
-  ; D corresponds to X
+  ; the lower 6 bits of D correspond to X
   INC D
+  LD A, D
+  AND A, %00111111
+  LD D, A
   LD A, GRID_SIZE
   SBC A, D
   JR NZ, .writeVerticalLine
@@ -201,6 +209,7 @@ main:
   CALL initPalette
   CALL initLayer2
   CALL clearScreen
+	; JR .infiniteLoop
   CALL drawSquare
 
 .infiniteLoop:
@@ -209,12 +218,28 @@ main:
 	RET
 
 ;;--------------------------------------------------------------------
-;; data
+;; variables / data
 ;;--------------------------------------------------------------------
 
-channel:
+; square_starts - an array of y offsets of the start of the square
+;  - i.e. for each column of pixels in the grid, what is the y offset
+;  - of the topmost pixel
+;  - there need to be GRID_SIZE of these and each one is < GRID_SIZE
+square_starts:
+  DB 0
+  DB 0
+  DB 0
+  DB 0
 
-
+; square_lengths - an array of y pixel counts for the square
+;  - i.e. how many pixels are in each column of pixels in the grid
+;  - there need to be GRID_SIZE of these and the sum of this and
+;    square_starts needs to be < GRID_SIZE
+square_sizes:
+  DB 0
+  DB 4
+  DB 4
+  DB 0
 
 ;;--------------------------------------------------------------------
 ;; Set up .nex output
