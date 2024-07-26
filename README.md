@@ -4,10 +4,10 @@ My explorations of the ZX Spectrum Next. These instructions are for Windows, Lin
 ## Project contents
 
 ### loadPng
-This is a Spectrum Next program which shows how to load a PNG image onto the Spectrum Next using Layer2. To prepare the image, use src\tools\pngDump.py.
+This Spectrum Next program loads a PNG image onto the Spectrum Next using Layer2. To prepare the image, use src\tools\pngDump.py.
 
 ### tools\pngDump.py
-This is a Python tool which takes supported PNG images and generates a palette and image data binary files which are easily loaded into the Spectrum Next. Only 320x256 palatted images are supported.
+This tool takes supported PNG images and generates palette and image data binary files, formatted in a way that is relatively easy to load onto the Spectrum Next (see program loadPng). Only 320x256 palatted images are supported.
 
 ## Setup / build / run instructions
 
