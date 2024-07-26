@@ -26,7 +26,7 @@
 			},
 			"group": {
 				"kind": "build",
-				"isDefault": true
+				"isDefault": false
 			}
 		},
 		{
@@ -54,10 +54,19 @@
 			},
 			"group": {
 				"kind": "build",
-				"isDefault": true
+				"isDefault": false
 			}
 		},
-		{
+    {
+      "label": "BuildAndCopy",
+      "dependsOn": ["Build", "Copy"],
+      "dependsOrder": "sequence",
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
 			"label": "Launch ZEsarUX",
 			"type": "shell",
 			"command": "${workspaceRoot}/SpectrumToolchain/ZEsarUX/ZEsarUX.exe",
