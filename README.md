@@ -3,6 +3,9 @@ My explorations of the ZX Spectrum Next. These instructions are for Windows, Lin
 
 ## Project contents
 
+### fullPalleteView (WIP)
+A Spectrum Next program that let's you scroll through the entire colour palette of the Spectrum Next - i.e. all 512 colours from the 9 bit palette. This is intended to be a Spectrum Next 'port' of https://9bit-colour.pages.dev/ and evolve along with it.
+
 ### loadPng
 This Spectrum Next program loads a PNG image onto the Spectrum Next using Layer2. To prepare the image, use src\tools\pngDump.py.
 
