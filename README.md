@@ -34,7 +34,7 @@ An sd card image is required in the checkout. This is used for the emulator. The
     - Copy onto an SD card
   - Copy the files `enNextZX.rom` and `enNxtmmc.rom` from the SD Card into the image folder (on my card these are in `\machines\next`)
   - Use an imager (e.g. Win32DiskImager https://sourceforge.net/projects/win32diskimager/) to make an .img file of the SD card and put it in the image folder. This file should be called `diskimage.img`
-  - Note that taking an image of an SD card > 16GB seems to cause issues so I use the pre-made image
+  - Note that taking an image of an SD card >= 16GB seems to cause issues so I use the pre-made image
 
 #### Setup
 To setup, these tools all need to be installed into the `.\SpectrumToolchain` folder:
