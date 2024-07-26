@@ -27,10 +27,19 @@
 
 initPalette:
   NEXTREG $43, %00010000
+  NEXTREG $40, 0
+  LD B, 0
+.loop
+  NEXTREG $44, 0
+  NEXTREG $44, 0
+  INC B
+  JR NZ, .loop
+  RET
 
+updatePalette:
+  NEXTREG $40, 0
   ; For now, set two colours, black and blue
   ; First black: first 0, second 0
-  NEXTREG $40, 0
   LD A, 0
   NEXTREG $44, A
   LD A, 0

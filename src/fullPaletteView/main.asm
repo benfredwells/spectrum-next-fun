@@ -38,15 +38,15 @@ start:
   INCLUDE "squares.asm"
 
 main:
+  ; JP main
   CALL initPalette
   CALL initLayer2
   CALL clearScreen
   CALL drawSquares
+  CALL updatePalette
 
 .infiniteLoop:
 	JR .infiniteLoop
-
-	RET
 
 ;;--------------------------------------------------------------------
 ;; variables / data
