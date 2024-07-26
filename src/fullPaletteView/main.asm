@@ -24,7 +24,7 @@ RES_X = 320
 RES_Y = 256
 LAYER_2_8K_BANKS = RES_X * RES_Y / BANK_SIZE_8K
 
-GRID_SIZE = 4
+GRID_SIZE = 8
 
 BG_COLOUR = 0
 FG_COLOUR = 1
@@ -229,20 +229,14 @@ main:
 ;  - of the topmost pixel
 ;  - there need to be GRID_SIZE of these and each one is < GRID_SIZE
 square_start_ys:
-  DB 1
-  DB 0
-  DB 0
-  DB 1
+  BYTE 0x02,0x01,0x00,0x00,0x00,0x00,0x01,0x02
 
 ; square_lengths - an array of y pixel counts for the square
 ;  - i.e. how many pixels are in each column of pixels in the grid
 ;  - there need to be GRID_SIZE of these and the sum of this and
 ;    square_starts needs to be < GRID_SIZE+1
 square_stop_ys:
-  DB 4
-  DB 5
-  DB 5
-  DB 4
+  BYTE 0x07,0x08,0x09,0x09,0x09,0x09,0x08,0x07
 
 ;;--------------------------------------------------------------------
 ;; Set up .nex output
