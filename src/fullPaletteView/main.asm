@@ -24,7 +24,7 @@ RES_X = 320
 RES_Y = 256
 LAYER_2_8K_BANKS = RES_X * RES_Y / BANK_SIZE_8K
 
-GRID_SIZE = 8
+GRID_SIZE = 32
 
 BG_COLOUR = 0
 FG_COLOUR = 1
@@ -184,6 +184,10 @@ drawSquare:
   BYTE 0
 .gridy
   BYTE 0
+  ; the initial bank, used as we might need to increment and set again while
+  ; drawing
+.startbank
+  BYTE 0
 .start
   PUSH BC
   LD HL, 0
@@ -196,6 +200,7 @@ drawSquare:
   SRL A
   LD D, LAYER2_8K_BANK
   ADD A, D
+  LD (.startbank), A
   ; Memory Management Slot 6 Bank $56
   ; Contains the 8K bank address for Slot 6
   NEXTREG $56, A
@@ -206,7 +211,21 @@ drawSquare:
   SLA A
   SLA A
   SLA A
+  SLA A
   LD (.startx), A
+  JR .writeVerticalLine
+.checkBank
+  ; check if the bank needs to be incremented
+  LD A, (.gridx)
+  LD B, A
+  LD A, (.startx)
+  ADD A, B
+  AND %00100000
+  JR Z, .writeVerticalLine
+  ; if the absolute x position was 32 we end up here. Increment bank
+  LD A, (.startbank)
+  INC A
+  NEXTREG $56, A
 .writeVerticalLine
   ; load the square start from data
   LD HL, square_start_ys
@@ -226,6 +245,7 @@ drawSquare:
   ; start offsets as well
   LD A, (.startx)
   ADD A, C
+  AND %00011111
   OR %11000000
   LD D, A
   LD E, B
@@ -249,7 +269,7 @@ drawSquare:
   LD (.gridx), A
   LD A, GRID_SIZE
   SBC A, C
-  JR NZ, .writeVerticalLine
+  JR NZ, .checkBank
   POP BC
   RET
 
@@ -263,7 +283,6 @@ main:
   CALL drawSquare.start
   ; then draw 8 palette squares at offset 4, 6 ... 18
   LD BC, $0004
-
 .paletteloop
   CALL drawSquare.start
   INC C
@@ -284,16 +303,17 @@ main:
 ; square_starts - an array of y offsets of the start of the square
 ;  - i.e. for each column of pixels in the grid, what is the y offset
 ;  - of the topmost pixel
-;  - there need to be GRID_SIZE of these and each one is < GRID_SIZE
+;  - there need to be GRID_SIZE of these and each one is < GRID_SIZE-1
 square_start_ys:
-  BYTE $02,$01,$00,$00,$00,$00,$01,$02
+  BYTE $02,$01,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+  BYTE $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$01,$02
 
 ; square_lengths - an array of y pixel counts for the square
 ;  - i.e. how many pixels are in each column of pixels in the grid
-;  - there need to be GRID_SIZE of these and the sum of this and
-;    square_starts needs to be < GRID_SIZE+1
+;  - there need to be GRID_SIZE of these and each one is < GRID_SIZE+1
 square_stop_ys:
-  BYTE $07,$08,$09,$09,$09,$09,$08,$07
+  BYTE $1F,$20,$21,$21,$21,$21,$21,$21,$21,$21,$21,$21,$21,$21,$21,$21
+  BYTE $21,$21,$21,$21,$21,$21,$21,$21,$21,$21,$21,$21,$21,$21,$20,$1F
 
 ;;--------------------------------------------------------------------
 ;; Set up .nex output
