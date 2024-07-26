@@ -56,7 +56,7 @@ Other useful tools:
 
 #### Build
 - Make sure there is a `.\build` folder
-- Open the .asm file to be built (e.g. `.\src\loadPng\main.asm`)
+- Open any file in the folder containing the main.asm file to be built (e.g. `.\src\loadPng\foo.bar`)
 - Run the Build command in vs code (ctrl+shift+B > Build)
 - This will create `.\build\test.nex`
 

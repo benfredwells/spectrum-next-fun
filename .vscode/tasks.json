@@ -9,7 +9,7 @@
 				"--sld=${workspaceRoot}/build/test.sld",
 				"--sym=${workspaceRoot}/build/test.labels",
 				"--fullpath",
-				"${file}"
+				"${fileDirname}/main.asm"
 			],
 			"problemMatcher": {
 				"fileLocation": [
