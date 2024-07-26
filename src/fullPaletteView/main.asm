@@ -229,14 +229,14 @@ main:
 ;  - of the topmost pixel
 ;  - there need to be GRID_SIZE of these and each one is < GRID_SIZE
 square_start_ys:
-  BYTE 0x02,0x01,0x00,0x00,0x00,0x00,0x01,0x02
+  BYTE $02,$01,$00,$00,$00,$00,$01,$02
 
 ; square_lengths - an array of y pixel counts for the square
 ;  - i.e. how many pixels are in each column of pixels in the grid
 ;  - there need to be GRID_SIZE of these and the sum of this and
 ;    square_starts needs to be < GRID_SIZE+1
 square_stop_ys:
-  BYTE 0x07,0x08,0x09,0x09,0x09,0x09,0x08,0x07
+  BYTE $07,$08,$09,$09,$09,$09,$08,$07
 
 ;;--------------------------------------------------------------------
 ;; Set up .nex output
