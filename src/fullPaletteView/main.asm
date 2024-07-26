@@ -33,6 +33,7 @@ start:
   JP main
 
   INCLUDE "init.asm"
+  INCLUDE "palette.asm"
   INCLUDE "clearScreen.asm"
   INCLUDE "squares.asm"
 
