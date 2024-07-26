@@ -178,21 +178,19 @@ drawSquare:
   ; Contains the 8K bank address for Slot 6
   NEXTREG $56, A
 
-  ; B is , E is Y within the grid square
+  ; C is X, E is Y within the grid square
   ; Start on the left
-  LD B, 0
+  LD BC, 0
 .writeVerticalLine
   ; load the square start from data
   LD HL, square_start_ys
-  LD A, L
-  ADD A, B
-  LD L, A
+  ADD HL, BC
   LD A, (HL)
   ; jump ahead those many pixels
   LD E, A
 .writePixel:
   ; add the slot offset to have DE point into the screen buffer
-  LD A, B
+  LD A, C
   OR A, %11000000
   LD D, A
   LD A, FG_COLOUR
@@ -200,16 +198,14 @@ drawSquare:
   INC E
   ; load the size for this column
   LD HL, square_stop_ys
-  LD A, L
-  ADD A, B
-  LD L, A
+  ADD HL, BC
   LD A, (HL)
   SBC A, E
   ; If we have done square_sizes[column] pixels we're done
   JR NZ, .writePixel
-  INC B
+  INC C
   LD A, GRID_SIZE
-  SBC A, B
+  SBC A, C
   JR NZ, .writeVerticalLine
   RET
 
