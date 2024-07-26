@@ -169,51 +169,108 @@ clearScreen:
   JP NZ, .loadBank
   RET
 
-
+; Call with C holding the x offset (where 1 offset == 16 pixels)
+; and B holding the Y offset (where 1 offset == 32 pixels)
+; B and C will be restored upon return
 drawSquare:
-  ; Initialize bank
-  LD C, LAYER2_8K_BANK
+  ; local variables
+  ; the x / y offsets of the grid as a whole
+.startx
+  BYTE 0
+.starty
+  BYTE 0
+  ; the current x / y position within the grid
+.gridx
+  BYTE 0
+.gridy
+  BYTE 0
+.start
+  PUSH BC
+  LD HL, 0
+  LD (.startx), HL
+  LD (.gridx), HL
+  ; Initialize bank. Due to the way this is called (currently) we can rely on
+  ; all columns being in the same bank, so we just need to look at the starting
+  ; x offset. Each bank covers 32 columns, which is 2 "offsets".
   LD A, C
+  SRL A
+  LD D, LAYER2_8K_BANK
+  ADD A, D
   ; Memory Management Slot 6 Bank $56
   ; Contains the 8K bank address for Slot 6
   NEXTREG $56, A
 
-  ; C is X, E is Y within the grid square
-  ; Start on the left
-  LD BC, 0
+  ; Find the start offsets
+  LD A, C
+  AND %00000001
+  SLA A
+  SLA A
+  SLA A
+  LD (.startx), A
 .writeVerticalLine
   ; load the square start from data
   LD HL, square_start_ys
+  LD BC, 0
+  LD A, (.gridx)
+  LD C, A
   ADD HL, BC
   LD A, (HL)
   ; jump ahead those many pixels
-  LD E, A
+  LD (.gridy), A
 .writePixel:
-  ; add the slot offset to have DE point into the screen buffer
-  LD A, C
-  OR A, %11000000
+  LD A, (.gridy)
+  LD B, A
+  LD A, (.gridx)
+  LD C, A
+  ; add the slot offset to have DE point into the screen buffer, and the
+  ; start offsets as well
+  LD A, (.startx)
+  ADD A, C
+  OR %11000000
   LD D, A
+  LD E, B
   LD A, FG_COLOUR
   LD (DE), A
-  INC E
+  INC B
+  LD A, B
+  LD (.gridy), A
   ; load the size for this column
   LD HL, square_stop_ys
+  LD BC, 0
+  LD A, (.gridx)
+  LD C, A
   ADD HL, BC
   LD A, (HL)
   SBC A, E
   ; If we have done square_sizes[column] pixels we're done
   JR NZ, .writePixel
   INC C
+  LD A, C
+  LD (.gridx), A
   LD A, GRID_SIZE
   SBC A, C
   JR NZ, .writeVerticalLine
+  POP BC
   RET
 
 main:
   CALL initPalette
   CALL initLayer2
   CALL clearScreen
-  CALL drawSquare
+
+  ; first draw control square at offset 1
+  LD BC, $0001
+  CALL drawSquare.start
+  ; then draw 8 palette squares at offset 4, 6 ... 18
+  LD BC, $0004
+
+.paletteloop
+  CALL drawSquare.start
+  INC C
+  INC C
+  LD A, 18
+  SBC A, C
+  JR NZ, .paletteloop
 
 .infiniteLoop:
 	JR .infiniteLoop
