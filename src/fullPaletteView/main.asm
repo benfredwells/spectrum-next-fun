@@ -217,6 +217,13 @@ drawSquare:
   SLA A
   SLA A
   LD (.startx), A
+  LD A, B
+  SLA A
+  SLA A
+  SLA A
+  SLA A
+  SLA A
+  LD (.starty), A
   JR .writeVerticalLine
 .checkBank
   ; check if the bank needs to be incremented
@@ -234,6 +241,9 @@ drawSquare:
 .writePixel:
   LD A, (.gridy)
   LD B, A
+  LD A, (.starty)
+  ADD A, B
+  LD E, A
   LD A, (.gridx)
   LD C, A
   ; add the slot offset to have DE point into the screen buffer, and the
@@ -243,7 +253,6 @@ drawSquare:
   AND %00011111
   OR %11000000
   LD D, A
-  LD E, B
   LD HL, square
   LD BC, (.squareindex)
   INC BC
@@ -276,11 +285,13 @@ main:
   CALL initLayer2
   CALL clearScreen
 
+  LD B, 0
+.rowloop
   ; first draw control square at offset 1
-  LD BC, $0001
+  LD C, $01
   CALL drawSquare.start
   ; then draw 8 palette squares at offset 4, 6 ... 18
-  LD BC, $0004
+  LD C, $04
 .paletteloop
   CALL drawSquare.start
   INC C
@@ -288,6 +299,11 @@ main:
   LD A, 18
   SBC A, C
   JR NZ, .paletteloop
+  INC B
+  ; do all that 8 times
+  LD A, 8
+  SBC A, B
+  JR NZ, .rowloop
 
 .infiniteLoop:
 	JR .infiniteLoop
