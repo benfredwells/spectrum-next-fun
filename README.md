@@ -1,5 +1,5 @@
 # spectrum-next-fun
-Some fun experiments with the ZX Spectrum Next. These instructions are for Windows.
+My explorations of the ZX Spectrum Next. These instructions are for Windows, Linux instructions to come.
 
 ## Project contents
 
@@ -30,7 +30,7 @@ An sd card image is required in the checkout. This is used for the emulator. The
 - You can get a pre-made image here: http://www.zxspectrumnext.online/cspect/ unzip this file - and the contained ROM files - into the image folder
 - Or you can make an image yourself
   - Get a Spectrum Next SD card, either by using your existing card or
-    - Download the latest SD card from https://www.specnext.com/category/downloads/ or 
+    - Download the latest SD card from https://www.specnext.com/category/downloads/ or
     - Copy onto an SD card
   - Copy the files `enNextZX.rom` and `enNxtmmc.rom` from the SD Card into the image folder (on my card these are in `\machines\next`)
   - Use an imager (e.g. Win32DiskImager https://sourceforge.net/projects/win32diskimager/) to make an .img file of the SD card and put it in the image folder. This file should be called `diskimage.img`
