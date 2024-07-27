@@ -46,12 +46,13 @@ BG_COLOUR = 0
 ; different shades of blue, as blue is the hard coded control colour
 ; TODO allow changing control channel
 ; starts with black and goes to full blue
+CHANNEL_SIZE = 8
 CONTROL_BEGIN = 1
-CONTROL_COUNT = 8
+CONTROL_COUNT = CHANNEL_SIZE
 ; PALETTE are the colours of the palette itself. This is 2d array of changing
 ; red \ green intensities.
 PALETTE_START = CONTROL_BEGIN + CONTROL_COUNT
-PALETTE_COUNT = 64
+PALETTE_COUNT = CHANNEL_SIZE * CHANNEL_SIZE
 
 ; When setting the palette we keep the first 8 bit palette value to send in B
 ; and the second in C
@@ -79,6 +80,26 @@ setChannel:
   LD C, A
   JR .orChannel
 .notBlue:
+  SLA D
+  SLA D
+  LD A, $01
+  CP E
+  JR NZ, .notBlueOrGreen
+  ; Handle green channel
+  LD A, B
+  AND %11100011
+  LD B, A
+  LD E, 0
+  JR .orChannel
+.notBlueOrGreen
+  ; Handle red channel
+  SLA D
+  SLA D
+  SLA D
+  LD A, B
+  AND %00011111
+  LD B, A
+  LD E, 0
 .orChannel
   LD A, B
   OR D
@@ -114,4 +135,30 @@ updatePalette:
   LD A, CONTROL_COUNT
   CP D
   JR NZ, .controlloop
+  ; Now do 8 x 8 iterations of the palette
+  LD BC, 0
+  ; TODO set control channel value from a global variable
+  ; start with DE being value 0, red channel. We set the red channel in
+  ; the outer loop
+  LD DE, $02
+.paletteouterloop
+  CALL setChannel
+  PUSH DE
+  ; now set DE to value 0, green channel. And set the green channel and the
+  ; set the palette index to the current colour in the inner loop
+  LD DE, $01
+.paletteinnerloop
+  CALL setChannel
+  LD A, B
+  NEXTREG $44, A
+  LD A, C
+  NEXTREG $44, A
+  INC D
+  LD A, CONTROL_COUNT
+  CP D
+  JR NZ, .paletteinnerloop
+  POP DE
+  INC D
+  CP D
+  JR NZ, .paletteouterloop
   RET

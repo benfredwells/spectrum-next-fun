@@ -127,26 +127,34 @@ drawSquare:
   POP BC
   RET
 
-drawScreen:
+; Call with C holding the x offset (where 1 offset == 16 pixels)
+; and D holding the fg colour to start. This will increment D by 8 and use each
+; value along the way for each call to drawSquare
+; Will draw for all y offsets (0-7)
+; Will mess with B
+drawColumn:
   LD B, 0
-  LD D, 0
-.rowloop
-  ; first draw control square at offset 1
-  LD C, $01
+.loop:
   CALL drawSquare.start
+  INC D
+  INC B
+  LD A, 8
+  SBC A, B
+  JR NZ, .loop
+  RET
+
+drawScreen:
+  LD D, 1
+  ; first draw control column at offset 1
+  LD C, $01
+  CALL drawColumn
   ; then draw 8 palette squares at offset 4, 6 ... 18
   LD C, $04
 .paletteloop
-  CALL drawSquare.start
+  CALL drawColumn
   INC C
   INC C
   LD A, 18
   SBC A, C
   JR NZ, .paletteloop
-  INC D
-  INC B
-  ; do all that 8 times
-  LD A, 8
-  SBC A, B
-  JR NZ, .rowloop
   RET
