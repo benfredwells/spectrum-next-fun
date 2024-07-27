@@ -93,6 +93,7 @@ drawSquare:
   LD A, (HL)
   ; ok, now we have the value from the bitmap for this pixel. if it is 0, we can
   ; skip drawing
+  OR A
   JR Z, .donedrawing
   ; so we have a pixel now. Load the colour to draw
   ; TODO make this a parameters
