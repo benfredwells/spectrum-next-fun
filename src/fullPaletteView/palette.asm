@@ -86,7 +86,7 @@ setChannel:
   LD A, C
   OR E
   LD C, A
-
+  RET
 
 updatePalette:
   NEXTREG $40, 0
@@ -101,8 +101,12 @@ updatePalette:
   ; First clear the control value and set the channel / value to call setChannel
   LD BC, 0
   LD DE, 0 ; TODO load from a global variable!
+.debug
+  ; JR .debug
 .controlloop
+  PUSH DE
   CALL setChannel
+  POP DE
   LD A, B
   NEXTREG $44, A
   LD A, C
