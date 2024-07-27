@@ -72,10 +72,10 @@ setChannel:
   SRL D
   RL E ; RL should rotate the carry flag into D0
   LD A, B
-  AND %00000011
+  AND %11111100
   LD B, A
   LD A, C
-  AND %00000001
+  AND %11111110
   LD C, A
   JR .orChannel
 .notBlue:
@@ -101,7 +101,7 @@ updatePalette:
   ; Now do 8 iterations of the control channel
   ; First clear the control value and set the channel / value to call setChannel
   LD BC, 0
-  LD DE, 0 ; TODO load from a global variable!
+  LD DE, 0 ; TODO load channel (E) from a global variable!
 .debug
   ; JR .debug
 .controlloop
