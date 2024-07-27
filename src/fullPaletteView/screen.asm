@@ -70,27 +70,35 @@ drawSquare:
   NEXTREG $56, A
 .writeVerticalLine
 .writePixel:
+  ; first setup E by adding gridy to starty
   LD A, (.gridy)
   LD B, A
   LD A, (.starty)
   ADD A, B
   LD E, A
+  ; then setup D by adding gridx to startx and also account for the slot offset
   LD A, (.gridx)
   LD C, A
-  ; add the slot offset to have DE point into the screen buffer, and the
-  ; start offsets as well
   LD A, (.startx)
   ADD A, C
   AND %00011111
   OR %11000000
   LD D, A
+  ; now figure out whether we need to draw or not and the colour to draw
   LD HL, square
   LD BC, (.squareindex)
   INC BC
   LD (.squareindex), BC
   ADD HL, BC
   LD A, (HL)
+  ; ok, now we have the value from the bitmap for this pixel. if it is 0, we can
+  ; skip drawing
+  JR Z, .donedrawing
+  ; so we have a pixel now. Load the colour to draw
+  ; TODO make this a parameters
+  LD A, PALETTE_START-1
   LD (DE), A
+.donedrawing:
   LD A, (.gridy)
   INC A
   LD (.gridy), A
