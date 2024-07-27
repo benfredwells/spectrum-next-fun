@@ -33,8 +33,60 @@ initPalette:
   NEXTREG $44, 0
   NEXTREG $44, 0
   INC B
+  ; We want to clear all 256 elements of the palette, so wait for B to wrap
+  ; around to 0
   JR NZ, .loop
   RET
+
+; The palette is as follows:
+; background colour, set to black
+; TODO allow toggling black / grey / white etc.
+BG_COLOUR = 0
+; CONTROL are the colours of the control channel strip. For now, this is set to
+; different shades of blue, as blue is the hard coded control colour
+; TODO allow changing control channel
+; starts with black and goes to full blue
+CONTROL_BEGIN = 1
+CONTROL_COUNT = 8
+; PALETTE are the colours of the palette itself. This is 2d array of changing
+; red \ green intensities.
+PALETTE_START = CONTROL_BEGIN + CONTROL_COUNT
+PALETTE_COUNT = 64
+
+; When setting the palette we keep the first 8 bit palette value to send in B
+; and the second in C
+; addChannel adds the value in D, in the channel E, to the value in BC.
+; channels are:
+; Blue = 0
+; Green = 1
+; Red = 2
+; This subroutine wipes DE
+setChannel:
+  XOR A
+  CP E
+  JR NZ, .notBlue
+  ; Handle blue channel
+  ; For blue (and the others) channel we put the value into DE in a way that can
+  ; be OR'd with BC for the new value
+  LD E, 0
+  SRL D
+  RL E ; RL should rotate the carry flag into D0
+  LD A, B
+  AND %00000011
+  LD B, A
+  LD A, C
+  AND %00000001
+  LD C, A
+  JR .orChannel
+.notBlue:
+.orChannel
+  LD A, B
+  OR D
+  LD B, A
+  LD A, C
+  OR E
+  LD C, A
+
 
 updatePalette:
   NEXTREG $40, 0
@@ -44,9 +96,19 @@ updatePalette:
   NEXTREG $44, A
   LD A, 0
   NEXTREG $44, A
-  ; Second blue: first %00000011, second %00000001
-  LD A, %00000011
+
+  ; Now do 8 iterations of the control channel
+  ; First clear the control value and set the channel / value to call setChannel
+  LD BC, 0
+  LD DE, 0 ; TODO load from a global variable!
+.controlloop
+  CALL setChannel
+  LD A, B
   NEXTREG $44, A
-  LD A, %00000001
+  LD A, C
   NEXTREG $44, A
+  INC D
+  LD A, CONTROL_COUNT
+  CP D
+  JR NZ, .controlloop
   RET

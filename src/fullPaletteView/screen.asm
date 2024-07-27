@@ -1,8 +1,5 @@
 GRID_SIZE = 32
 
-BG_COLOUR = 0
-FG_COLOUR = 1
-
 ; Call with C holding the x offset (where 1 offset == 16 pixels)
 ; and B holding the Y offset (where 1 offset == 32 pixels)
 ; B and C will be restored upon return
