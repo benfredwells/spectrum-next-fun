@@ -2,7 +2,8 @@ GRID_SIZE = 32
 
 ; Call with C holding the x offset (where 1 offset == 16 pixels)
 ; and B holding the Y offset (where 1 offset == 32 pixels)
-; B and C will be restored upon return
+; and D holding the fg colour
+; BC, DE will be restored upon return
 drawSquare:
   ; local variables
   ; the x / y offsets of the grid as a whole
@@ -22,12 +23,17 @@ drawSquare:
   ; drawing
 .startbank
   BYTE 0
+.fgcolour
+  BYTE 0
 .start
   PUSH BC
+  PUSH DE
   LD HL, 0
   LD (.startx), HL
   LD (.gridx), HL
   LD (.squareindex), HL
+  LD A, D
+  LD (.fgcolour), A
   ; Initialize bank. Due to the way this is called (currently) we can rely on
   ; all columns being in the same bank, so we just need to look at the starting
   ; x offset. Each bank covers 32 columns, which is 2 "offsets".
@@ -97,7 +103,7 @@ drawSquare:
   JR Z, .donedrawing
   ; so we have a pixel now. Load the colour to draw
   ; TODO make this a parameters
-  LD A, PALETTE_START-1
+  LD A, (.fgcolour)
   LD (DE), A
 .donedrawing:
   LD A, (.gridy)
@@ -117,11 +123,13 @@ drawSquare:
   LD A, GRID_SIZE
   SBC A, C
   JR NZ, .checkBank
+  POP DE
   POP BC
   RET
 
 drawScreen:
   LD B, 0
+  LD D, 0
 .rowloop
   ; first draw control square at offset 1
   LD C, $01
@@ -135,6 +143,7 @@ drawScreen:
   LD A, 18
   SBC A, C
   JR NZ, .paletteloop
+  INC D
   INC B
   ; do all that 8 times
   LD A, 8

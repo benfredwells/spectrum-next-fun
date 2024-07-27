@@ -60,8 +60,8 @@ PALETTE_COUNT = 64
 ; Blue = 0
 ; Green = 1
 ; Red = 2
-; This subroutine wipes DE
 setChannel:
+  PUSH DE
   XOR A
   CP E
   JR NZ, .notBlue
@@ -86,6 +86,7 @@ setChannel:
   LD A, C
   OR E
   LD C, A
+  POP DE
   RET
 
 updatePalette:
@@ -104,9 +105,7 @@ updatePalette:
 .debug
   ; JR .debug
 .controlloop
-  PUSH DE
   CALL setChannel
-  POP DE
   LD A, B
   NEXTREG $44, A
   LD A, C
