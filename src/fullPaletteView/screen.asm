@@ -1,3 +1,7 @@
+GRID_SIZE = 32
+
+BG_COLOUR = 0
+FG_COLOUR = 1
 
 ; Call with C holding the x offset (where 1 offset == 16 pixels)
 ; and B holding the Y offset (where 1 offset == 32 pixels)
@@ -110,7 +114,7 @@ drawSquare:
   POP BC
   RET
 
-drawSquares:
+drawScreen:
   LD B, 0
 .rowloop
   ; first draw control square at offset 1

@@ -24,25 +24,20 @@ RES_X = 320
 RES_Y = 256
 LAYER_2_8K_BANKS = RES_X * RES_Y / BANK_SIZE_8K
 
-GRID_SIZE = 32
-
-BG_COLOUR = 0
-FG_COLOUR = 1
-
 start:
   JP main
 
   INCLUDE "init.asm"
   INCLUDE "palette.asm"
   INCLUDE "clearScreen.asm"
-  INCLUDE "squares.asm"
+  INCLUDE "screen.asm"
 
 main:
   ; JP main
   CALL initPalette
   CALL initLayer2
   CALL clearScreen
-  CALL drawSquares
+  CALL drawScreen
   CALL updatePalette
 
 .infiniteLoop:
