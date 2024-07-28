@@ -138,15 +138,15 @@ updatePalette:
   ; Now do 8 x 8 iterations of the palette
   LD BC, 0
   ; TODO set control channel value from a global variable
-  ; start with DE being value 0, red channel. We set the red channel in
+  ; start with DE being value 0, green channel. We set the green channel in
   ; the outer loop
-  LD DE, $02
+  LD DE, $01
 .paletteouterloop
   CALL setChannel
   PUSH DE
-  ; now set DE to value 0, green channel. And set the green channel and the
+  ; now set DE to value 0, red channel. And set the red channel and the
   ; set the palette index to the current colour in the inner loop
-  LD DE, $01
+  LD DE, $02
 .paletteinnerloop
   CALL setChannel
   LD A, B
