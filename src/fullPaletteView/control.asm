@@ -11,6 +11,10 @@ gLastControlChannel:
   BYTE 0
 gLastControlValue:
   BYTE 0
+gVar1Channel:
+  BYTE 1
+gVar2Channel:
+  BYTE 2
   ; lil buffer to not confuse debugger
   WORD 0
 
@@ -77,6 +81,12 @@ controlTick:
   LD B, CHANNEL_COUNT
   CALL decrementMod
   LD (gControlChannel), A
+  LD A, (gVar1Channel)
+  CALL decrementMod
+  LD (gVar1Channel), A
+  LD A, (gVar2Channel)
+  CALL decrementMod
+  LD (gVar2Channel), A
 .checkR
   BIT 3, D
   JR Z, .checkChange
@@ -87,12 +97,18 @@ controlTick:
   LD B, CHANNEL_COUNT
   CALL incrementMod
   LD (gControlChannel), A
+  LD A, (gVar1Channel)
+  CALL incrementMod
+  LD (gVar1Channel), A
+  LD A, (gVar2Channel)
+  CALL incrementMod
+  LD (gVar2Channel), A
 .checkChange
   ; it doesn't really matter but only update palette if something changed
   ; first check if the channel changed
   LD A, (gControlChannel)
   LD B, A
-  LD A (gLastControlChannel)
+  LD A, (gLastControlChannel)
   CP B
   JR NZ, .handleStateChange
   ; now check if the value changed

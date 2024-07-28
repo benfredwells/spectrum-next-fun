@@ -142,13 +142,17 @@ updatePalette:
   ; TODO set control channel value from a global variable
   ; start with DE being value 0, green channel. We set the green channel in
   ; the outer loop
-  LD DE, $01
+  LD A, (gVar1Channel)
+  LD E, A
+  LD D, 0
 .paletteouterloop
   CALL setChannel
   PUSH DE
   ; now set DE to value 0, red channel. And set the red channel and the
   ; set the palette index to the current colour in the inner loop
-  LD DE, $02
+  LD A, (gVar2Channel)
+  LD E, A
+  LD D, 0
 .paletteinnerloop
   CALL setChannel
   LD A, B
