@@ -31,6 +31,7 @@ start:
   INCLUDE "palette.asm"
   INCLUDE "clearScreen.asm"
   INCLUDE "screen.asm"
+  INCLUDE "control.asm"
 
 main:
   ; JP main
@@ -41,6 +42,7 @@ main:
   CALL updatePalette
 
 .infiniteLoop:
+  CALL controlTick
 	JR .infiniteLoop
 
 ;;--------------------------------------------------------------------
