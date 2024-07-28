@@ -53,6 +53,7 @@ CONTROL_COUNT = CHANNEL_SIZE
 ; red \ green intensities.
 PALETTE_START = CONTROL_BEGIN + CONTROL_COUNT
 PALETTE_COUNT = CHANNEL_SIZE * CHANNEL_SIZE
+BORDER_START = PALETTE_START + PALETTE_COUNT
 
 ; When setting the palette we keep the first 8 bit palette value to send in B
 ; and the second in C
@@ -153,7 +154,7 @@ updatePalette:
   LD A, C
   NEXTREG $44, A
   INC D
-  LD A, CONTROL_COUNT
+  LD A, CHANNEL_SIZE
   CP D
   JR NZ, .controlloop
   ; Now do 8 x 8 iterations of the palette
@@ -184,11 +185,30 @@ updatePalette:
   LD A, C
   NEXTREG $44, A
   INC D
-  LD A, CONTROL_COUNT
+  LD A, CHANNEL_SIZE
   CP D
   JR NZ, .paletteinnerloop
   POP DE
   INC D
   CP D
   JR NZ, .paletteouterloop
+  ; Now set the border colours. There are eight border colours, for each
+  ; control value. The border colour for a given control value will be the
+  ; background if it isn't the current value, otherwise it will be white
+  LD D, 0
+.borderloop
+  LD BC, 0
+  LD A, (gControlValue)
+  CP D
+  JR NZ, .setBorderPalette
+  LD BC, $FF01
+.setBorderPalette
+  LD A, B
+  NEXTREG $44, A
+  LD A, C
+  NEXTREG $44, A
+  INC D
+  LD A, CHANNEL_SIZE
+  CP D
+  JR NZ, .borderloop
   RET
