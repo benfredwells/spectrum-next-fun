@@ -7,6 +7,10 @@ gControlValue:
   BYTE 0
 gLastTREWQ:
   BYTE $1F
+gLastControlChannel:
+  BYTE 0
+gLastControlValue:
+  BYTE 0
   ; lil buffer to not confuse debugger
   WORD 0
 
@@ -75,13 +79,14 @@ controlTick:
   LD (gControlChannel), A
 .checkR
   BIT 3, D
-  JR Z, .done
+  JR Z, .checkChange
   BIT 3, E
-  JR NZ, .done
+  JR NZ, .checkChange
   ; E has gone down, increment channel mod CHANNEL_COUNT
   LD A, (gControlChannel)
   LD B, CHANNEL_COUNT
   CALL incrementMod
   LD (gControlChannel), A
-.done
+.checkChange
+  CALL updatePalette
   RET

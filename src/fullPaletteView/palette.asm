@@ -122,7 +122,9 @@ updatePalette:
   ; Now do 8 iterations of the control channel
   ; First clear the control value and set the channel / value to call setChannel
   LD BC, 0
-  LD DE, 0 ; TODO load channel (E) from a global variable!
+  LD A, (gControlChannel)
+  LD E, A
+  LD D, 0
 .debug
   ; JR .debug
 .controlloop
