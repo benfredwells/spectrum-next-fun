@@ -111,6 +111,25 @@ setChannel:
   RET
 
 updatePalette:
+  ; first, to get around what looks like a bug in the Next, avoid writing a
+  ; palette entry that will clash with the global transparency index. To do
+  ; that, set the global transparency index to something that won't be used.
+  ; (seems like global transprency isn't an index but the main byte bits of
+  ; the colour, in effect)
+  ; A colour that won't be used is something wth all bits set in the variable
+  ; channels, and a control channel value different in bit 1 or 2
+  LD BC, $FF01
+  ; First set control channel value
+  LD A, (gControlChannel)
+  LD E, A
+  LD A, (gControlValue)
+  LD D, A
+  ; increment twice to make sure it changes
+  INC D
+  INC D
+  CALL setChannel
+  CALL setGlobalTransparency
+
   NEXTREG $40, 0
   ; For now, set two colours, black and blue
   ; First black: first 0, second 0

@@ -54,3 +54,11 @@ initLayer2:
   NEXTREG $18, 0
   NEXTREG $18, RES_Y - 1
   RET
+
+; Call with desired colour in B
+setGlobalTransparency:
+  LD A, B
+  ; Global Transparency $14
+  ; Bit Effect
+  ; 7-0 Sets index of transparent colour
+  NEXTREG $14, A
