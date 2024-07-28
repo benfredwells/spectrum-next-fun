@@ -118,16 +118,24 @@ updatePalette:
   ; (seems like global transprency isn't an index but the main byte bits of
   ; the colour, in effect)
   ; A colour that won't be used is something wth all bits set in the variable
-  ; channels, and a control channel value different in bit 1 or 2
+  ; channels, and a control channel value that is different in bits 1 and 2 but
+  ; not all white (as that will clash with the border)
   LD BC, $FF01
   ; First set control channel value
   LD A, (gControlChannel)
   LD E, A
   LD A, (gControlValue)
+  ; if the two high bits of the value are 0, set the value to 2 (bit 1 is set)
+  AND $06
+  JR Z, .setTo02
+  ; otherwise so just clear it
+  XOR A
+  JR .setTrans
+  ; It was
+.setTo02
+  LD A, 2
+.setTrans
   LD D, A
-  ; increment twice to make sure it changes
-  INC D
-  INC D
   CALL setChannel
   CALL setGlobalTransparency
 

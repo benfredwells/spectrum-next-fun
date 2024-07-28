@@ -3,6 +3,7 @@ GRID_SIZE = 32
 ; Call with C holding the x offset (where 1 offset == 16 pixels)
 ; and B holding the Y offset (where 1 offset == 32 pixels)
 ; and D holding the fg colour
+; and E holding the border colour
 ; BC, DE will be restored upon return
 drawSquare:
   ; local variables
@@ -25,6 +26,8 @@ drawSquare:
   BYTE 0
 .fgcolour
   BYTE 0
+.border
+  BYTE 0
 .start
   PUSH BC
   PUSH DE
@@ -34,6 +37,8 @@ drawSquare:
   LD (.squareindex), HL
   LD A, D
   LD (.fgcolour), A
+  LD A, E
+  LD (.border), A
   ; Initialize bank. Due to the way this is called (currently) we can rely on
   ; all columns being in the same bank, so we just need to look at the starting
   ; x offset. Each bank covers 32 columns, which is 2 "offsets".
@@ -103,7 +108,15 @@ drawSquare:
   JR Z, .donedrawing
   ; so we have a pixel now. Load the colour to draw
   ; TODO make this a parameters
+  LD B, A
+  LD A, 2 ; test border
+  CP B
+  JR Z, .drawBorder
   LD A, (.fgcolour)
+  LD (DE), A
+  JR .donedrawing
+.drawBorder
+  LD A, (.border)
   LD (DE), A
 .donedrawing:
   LD A, (.gridy)
@@ -128,14 +141,20 @@ drawSquare:
   RET
 
 ; Call with C holding the x offset (where 1 offset == 16 pixels)
-; and D holding the fg colour to start. This will increment D by 8 and use each
-; value along the way for each call to drawSquare
+; and D holding the fg colour to start. This will increment for each square
+;     E holding the border colour to start. This will increment for each square,
+;       unless it is 0 in which case it will stay at 0
 ; Will draw for all y offsets (0-7)
 ; Will mess with B
 drawColumn:
   LD B, 0
 .loop:
   CALL drawSquare.start
+  LD A, E
+  OR A
+  JR Z, .doneIncrementingBorder
+  INC E
+.doneIncrementingBorder
   INC D
   INC B
   LD A, 8
@@ -145,11 +164,13 @@ drawColumn:
 
 drawScreen:
   LD D, 1
+  LD E, BORDER_START
   ; first draw control column at offset 1
   LD C, $01
   CALL drawColumn
   ; then draw 8 palette squares at offset 4, 6 ... 18
   LD C, $04
+  LD E, 0
 .paletteloop
   CALL drawColumn
   INC C
