@@ -139,7 +139,12 @@ updatePalette:
   JR NZ, .controlloop
   ; Now do 8 x 8 iterations of the palette
   LD BC, 0
-  ; TODO set control channel value from a global variable
+  ; First set control channel value
+  LD A, (gControlChannel)
+  LD E, A
+  LD A, (gControlValue)
+  LD D, A
+  CALL setChannel
   ; start with DE being value 0, green channel. We set the green channel in
   ; the outer loop
   LD A, (gVar1Channel)
