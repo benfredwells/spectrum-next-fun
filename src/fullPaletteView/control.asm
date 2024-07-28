@@ -42,9 +42,9 @@ controlTick:
   IN A, (C)
   LD (gLastTREWQ), A
   CP D
-  JR NZ, .changeHandler
+  JR NZ, .handleKeyStateChange
   RET
-.changeHandler
+.handleKeyStateChange
   ; we are here because TREWQ changed
   LD E, A
   ; check Q
@@ -88,5 +88,26 @@ controlTick:
   CALL incrementMod
   LD (gControlChannel), A
 .checkChange
+  ; it doesn't really matter but only update palette if something changed
+  ; first check if the channel changed
+  LD A, (gControlChannel)
+  LD B, A
+  LD A (gLastControlChannel)
+  CP B
+  JR NZ, .handleStateChange
+  ; now check if the value changed
+  LD A, (gControlValue)
+  LD C, A
+  LD A, (gLastControlValue)
+  CP C
+  JR NZ, .handleStateChange
+  ; nothing chnaged, bail
+  RET
+.handleStateChange
+  ; save changed state
+  LD A, B
+  LD (gLastControlChannel), A
+  LD A, C
+  LD (gLastControlValue), A
   CALL updatePalette
   RET
