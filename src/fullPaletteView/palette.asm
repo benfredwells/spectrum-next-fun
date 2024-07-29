@@ -25,6 +25,30 @@
 ; 6-1 Reserved, set to 0
 ; 0   B0
 
+
+
+gCurrentPalette:
+  WORD 0
+
+; once setUsePalette1 or swapPalette is called, we write to the palette that
+; isn't being used. Then swap will make that palette
+setUsePalette1:
+  NEXTREG $43, %01010000
+  RET
+
+swapPalette:
+  LD A, (gCurrentPalette)
+  OR A
+  JR Z, .setPalette2
+  LD A, 0
+  LD (gCurrentPalette), A
+  JR setUsePalette1
+.setPalette2:
+  LD A, 1
+  LD (gCurrentPalette), A
+  NEXTREG $43, %00010100
+  RET
+
 initPalette:
   NEXTREG $43, %00010000
   NEXTREG $40, 0
@@ -36,6 +60,7 @@ initPalette:
   ; We want to clear all 256 elements of the palette, so wait for B to wrap
   ; around to 0
   JR NZ, .loop
+  CALL setUsePalette1
   RET
 
 ; The palette is as follows:
@@ -219,4 +244,5 @@ updatePalette:
   LD A, CHANNEL_SIZE
   CP D
   JR NZ, .borderloop
+  CALL swapPalette
   RET

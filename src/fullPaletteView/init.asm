@@ -62,3 +62,4 @@ setGlobalTransparency:
   ; Bit Effect
   ; 7-0 Sets index of transparent colour
   NEXTREG $14, A
+  RET
